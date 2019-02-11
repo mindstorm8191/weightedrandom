@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Weighted Random Example by Danny Bartsch</title>
+        <script type="text/javascript">
+
+            class weightedrandom {
+                // This class is a tool to simulate a marble-bag form of random item selection. Rather than having an even chance to pick
+                // each item, this allows you to control the chances of getting each item, based on the total number of items in the bag.
+                // Items can be removed while being picked (using pull() ), or left in the bag (using get() ). You can also see the chances
+                // of getting any item with chanceof(), or all items with allchances()
+
+                // This represents a marble bag, where all your possible values are placed
+                constructor() {
+                    this.elements = [];
+                    this.totalcount = 0;
+                }
+                
+                put(value, count=1) {
+                    // Puts 'marbles' into the bag. Use count to specify how many of this type of item is to be put into the bag
+                    this.elements.push({"item": value, "count": parseInt(count)});
+                    this.totalcount += parseInt(count);
+                }
+                
+                pull() {
+                    // Pulls a marble out of the bag, returning its value
+                    let target = Math.floor(Math.random()*this.totalcount);
+                    for(let i=0; i<this.elements.length; i++) {
+                        if(target>=this.elements[i].count) {
+                            target-=this.elements[i].count;
+                            continue;
+                        }
+
+                        this.elements[i].count--;
+                        this.totalcount--;
+                        if(this.elements[i].count==0) {
+                            let catchitem = this.elements[i].item;
+                            this.elements.splice(i,1);
+                            return catchitem;
+                        }
+                        return this.elements[i].item;
+                    }
+                }
+
+                get() {
+                    // Returns a marble from the bag, but does not remove it
+                    let target = Math.floor(Math.random()*this.totalcount);
+                    for(let i=0; i<this.elements.length; i++) {
+                        if(target>=this.elements[i].count) {
+                            target -= this.elements[i].count;
+                            continue;
+                        }
+                        return this.elements[i].item;
+                    }
+                    return undefined;
+                }
+
+                size() {
+                    // Returns the total number of elements currently in the array
+                    return this.totalcount;
+                }
+
+                chanceof(matchingitem) {
+                    // Returns the chances of getting a given item. Possible values range from 0 to 1.
+                    // If you would like a percentage of this, simply do Math.floor(yourObject.chanceof(targetItem)*100)
+                    for(let i=0; i<this.elements.length; i++) {
+                        if(this.elements[i].item!=matchingitem) {
+                            continue;
+                        }
+                        return this.elements[i].count/this.totalcount;
+                    }
+                    return 0;
+                }
+
+                allchances() {
+                    // Returns an array containing the chances of getting each type of item in the bag
+                    let collector = [];
+                    for(let i=0; i<this.elements.length; i++) {
+                        collector.push({"item": this.elemenents[i].item, "chance": this.elements[i].count/this.totalcount});
+                    }
+                    return collector;
+                }
+            }
+
+            let active = new weightedrandom();
+
+            // Below is a sample page to show the weightedrandom class in action. You can put numbers into the bag, remove them, even reset the bag
+        </script>
+    </head>
+    <body>
+        <h2>Weighted Random Example</h2>
+        <p>
+            Input your item (number): <input type="text" id="inputvalue"> Number of entries: <input type="text" id="inputcount"><br />
+            <button onclick="pushvalue()">Add</button> or <button onclick="popvalue()">Remove</button> or <button onclick="resetunit()">Reset</button>
+            <div id="boxsize">Count = 0</div>
+            <div id="outputbox"></div>
+        </p>
+
+        <script type="text/javascript">
+            function pushvalue() {
+                active.put(document.getElementById("inputvalue").value, document.getElementById("inputcount").value);
+                document.getElementById("boxsize").innerHTML = "Count = "+ active.size();
+            }
+
+            function popvalue() {
+                let x = document.getElementById("outputbox");
+                x.innerHTML = x.innerHTML + active.pull() +'<br />';
+                document.getElementById("boxsize").innerHTML = "Count = "+ active.size();
+            }
+
+            function resetunit() {
+                active = new weightedrandom();
+                document.getElementById("boxsize").innerHTML = "Count = "+ active.size();
+                document.getElementById("outputbox").innerHTML = "";
+            }
+        </script>
+    </body>
+</html>
